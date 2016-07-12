@@ -1,6 +1,7 @@
 import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
+import './services/scheduler';
 
 import Record from './models/record';
 
@@ -15,7 +16,7 @@ app.use(express.static(path.resolve('build/client')));
 const wrap = fn => (...args) => fn(...args).catch(args[2]); // re-throw express error to next()
 
 app.get('/api/record', wrap(async (req, res, next) => {
-  const records = Record.find({});
+  const records = await Record.find({});
   res.send(records);
 }));
 
