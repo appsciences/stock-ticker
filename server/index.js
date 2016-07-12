@@ -15,12 +15,12 @@ app.use(express.static(path.resolve('build/client')));
 
 const wrap = fn => (...args) => fn(...args).catch(args[2]); // re-throw express error to next()
 
-app.get('/api/record', wrap(async (req, res, next) => {
+app.get('/api/record', wrap(async(req, res, next) => {
   const records = await Record.find({});
   res.send(records);
 }));
 
-app.post('/api/record', async (req, res, next) => {
+app.post('/api/record', async(req, res, next) => {
   const { symbol } = req.body;
   const savedRecord = await new Record({ symbol }).save();
   res.send(savedRecord);

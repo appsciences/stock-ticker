@@ -7,60 +7,60 @@ import RecordsMenu from '../components/RecordsMenu';
 import { fetchRecords, saveNewRecord } from '../actions';
 
 class App extends React.Component {
-	constructor(props) {
-		super(props);
+  constructor(props) {
+    super(props);
 
-		this.state = {
-			selectedRecord: {},
-			records: []
-		};
+    this.state = {
+      selectedRecord: {},
+      records: []
+    };
 
-		this.newRecordCreate = this.newRecordCreate.bind(this);
-		this.selectRecord = this.selectRecord.bind(this);
-	}
-	
-	componentDidMount() {
-		fetchRecords().then(records => {
-			this.setState({ records });
+    this.newRecordCreate = this.newRecordCreate.bind(this);
+    this.selectRecord = this.selectRecord.bind(this);
+  }
 
-			if (records.length) {
-				this.selectRecord(records[0]);
-			}
-		});
-	}
+  componentDidMount() {
+    fetchRecords().then(records => {
+      this.setState({ records });
 
-	newRecordCreate(symbol) {
-		saveNewRecord(symbol).then(record => {
-				this.setState({
-					records: [...this.state.records, record]
-				});
-			});
-	}
+      if (records.length) {
+        this.selectRecord(records[0]);
+      }
+    });
+  }
 
-	selectRecord(selectedRecord) {
-		this.setState({ selectedRecord });
-	}
+  newRecordCreate(symbol) {
+    saveNewRecord(symbol).then(record => {
+      this.setState({
+        records: [...this.state.records, record]
+      });
+    });
+  }
 
-	render() {
-		return (
-			<div>
-				<br />
-				<div className="col-md-2">
-					<RecordsMenu
-						selected={this.state.selectedRecord}
-						onSelect={this.selectRecord}
-						records={this.state.records}
-					/>
-				</div>
-				<div className="col-md-3">
-					<NewRecordControl onCreate={this.newRecordCreate} />
-				</div>
-				<div>
-					<MarketsTable />
-				</div>
-			</div>
-		)
-	}
+  selectRecord(selectedRecord) {
+    this.setState({ selectedRecord });
+  }
+
+  render() {
+    return (
+      <div>
+        <br />
+        <div className="col-md-2">
+          <RecordsMenu
+            selected={this.state.selectedRecord}
+            onSelect={this.selectRecord}
+            records={this.state.records}
+          />
+        </div>
+        <div className="col-md-3">
+          <NewRecordControl onCreate={this.newRecordCreate} />
+        </div>
+        <div>
+          <MarketsTable />
+        </div>
+      </div>
+    )
+  }
 }
 
 export default App;
