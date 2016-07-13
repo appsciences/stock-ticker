@@ -1,10 +1,10 @@
 import React from 'react';
 
-import MarketsTable from '../components/MarketsTable';
+import NumbersTable from '../components/NumbersTable';
 import NewRecordControl from '../components/NewRecordControl';
 import RecordsMenu from '../components/RecordsMenu';
 
-import { fetchRecords, saveNewRecord } from '../actions';
+import { fetchRecords, saveNewRecord, subscribeOnUpdates } from '../actions';
 
 class App extends React.Component {
   constructor(props) {
@@ -20,13 +20,16 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    fetchRecords().then(records => {
+    const handler = records => {
       this.setState({ records });
 
       if (records.length) {
         this.selectRecord(records[0]);
       }
-    });
+    };
+    
+    fetchRecords().then(handler);
+    subscribeOnUpdates(handler);
   }
 
   newRecordCreate(symbol) {
@@ -56,7 +59,10 @@ class App extends React.Component {
           <NewRecordControl onCreate={this.newRecordCreate} />
         </div>
         <div>
-          <MarketsTable />
+          {
+            this.state.selectedRecord.numbers &&
+            <NumbersTable record={this.state.selectedRecord} />
+          }
         </div>
       </div>
     )

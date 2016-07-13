@@ -17,5 +17,10 @@ export function getQuotes(symbols) {
   };
 
   return request(options)
-    .then(response => response.query.results.quote);
+    .then(response => {
+	    const { quote } = response.query.results;
+
+	    // return an array in any case
+	    return Array.isArray(quote) ? quote : [quote];
+    });
 }

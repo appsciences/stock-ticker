@@ -1,5 +1,7 @@
 import schedule from 'node-schedule';
 
+import { updateRecords } from './updater';
+
 const toMilliseconds = (seconds, minutes = 0) => (minutes * 60 + seconds) * 1000;
 
 const timings = [
@@ -36,17 +38,19 @@ const timings = [
 ];
 
 timings.forEach(timing => {
-  const handler = () => {
-    // TODO call updater
-  };
-
-  timing.values.forEach(cron => schedule.scheduleJob(cron, () => {
+  timing.value.forEach(cron => schedule.scheduleJob(cron, () => {
     if (timing.after) {
       timing.after.forEach(after => {
-        setTimeout(handler, after.value);
+        setTimeout(() => executeUpdating(after.id), after.value);
       });
     }
 
-    handler();
+    executeUpdating(timing.id);
   }));
 });
+
+function executeUpdating(timingId) {
+  console.log('Running job: timingId=', timingId);
+  updateRecords(timingId);
+}
+

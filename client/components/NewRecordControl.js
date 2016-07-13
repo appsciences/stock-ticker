@@ -11,12 +11,18 @@ import {
 const NewRecordControl = ({ onCreate }) => {
   let input;
 
+  const clickHandler = () => {
+    const node = ReactDOM.findDOMNode(input);
+    onCreate(node.value);
+    node.value = '';
+  };
+
   return (
     <FormGroup>
       <InputGroup>
         <FormControl type="text" ref={n => input = n} />
         <InputGroup.Button>
-          <Button onClick={() => onCreate(ReactDOM.findDOMNode(input).value)}>
+          <Button onClick={clickHandler}>
             Add
           </Button>
         </InputGroup.Button>
