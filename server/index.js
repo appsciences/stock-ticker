@@ -7,10 +7,11 @@ import socketIO from 'socket.io';
 import './services/scheduler';
 
 import Record from './models/record';
-import './services/updater';
+import { addOnUpdateListener, removeOnUpdateListener } from './services/updater';
+
 
 const app = express();
-const server = http.Server(app);
+const server = http.createServer(app);
 const io = socketIO(server);
 
 const mongoose = require('mongoose');
@@ -23,26 +24,26 @@ app.use(express.static(path.resolve('build/client')));
 const wrap = fn => (...args) => fn(...args).catch(args[2]); // re-throw express error to next()
 
 app.get('/api/record', wrap(async(req, res, next) => {
-  const records = await Record.find({}).exec();
+  const records = await Record.find().exec();
   res.send(records);
 }));
 
 app.post('/api/record', wrap(async(req, res, next) => {
   const { symbol } = req.body;
 
-  const timingsCount = 13;
-  const zeroArray = Array.from({ length: timingsCount }, () => 0);
+  // const timingsCount = 13;
+  // const zeroArray = Array.from({ length: timingsCount }, () => 0);
 
   const record = new Record({
     symbol,
-    numbers: {
-      'day0': zeroArray,
-      'day1': zeroArray,
-      'day2': zeroArray,
-      'day3': zeroArray,
-      'day4': zeroArray,
-      'day5': zeroArray
-    }
+    // numbers: {
+    //   'day0': zeroArray,
+    //   'day1': zeroArray,
+    //   'day2': zeroArray,
+    //   'day3': zeroArray,
+    //   'day4': zeroArray,
+    //   'day5': zeroArray
+    // }
   });
 
   const savedRecord = await record.save();
@@ -53,11 +54,21 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve('build/client/index.html'));
 });
 
-app.listen(3000, () => {
+server.listen(3000, () => {
   console.log('server started. port: 3000');
 });
 
 io.on('connection', function (socket) {
+  const updateHandler = async () => {
+    socket.emit('records', await Record.find().exec());
+  };
+
   console.log('connected');
-  socket.emit('news', { hello: 'world' });
+
+  addOnUpdateListener(updateHandler);
+
+  socket.on('disconnect', () => {
+    console.log('disconnect');
+    removeOnUpdateListener(updateHandler);
+  });
 });

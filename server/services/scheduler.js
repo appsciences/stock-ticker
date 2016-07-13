@@ -1,6 +1,6 @@
 import schedule from 'node-schedule';
 
-import { updateRecords } from './updater';
+import { updateRecords, storeCurrentAsFinal } from './updater';
 
 const toMilliseconds = (seconds, minutes = 0) => (minutes * 60 + seconds) * 1000;
 
@@ -47,6 +47,10 @@ timings.forEach(timing => {
 
     executeUpdating(timing.id);
   }));
+});
+
+schedule.scheduleJob('0 0 * * *', () => {
+  storeCurrentAsFinal();
 });
 
 function executeUpdating(timingId) {

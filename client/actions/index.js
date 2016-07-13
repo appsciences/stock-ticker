@@ -1,8 +1,14 @@
 import 'whatwg-fetch';
 import io from 'socket.io-client';
 
-const socket = io();
+const socket = io.connect(window.location.origin);
 
+const onUpdatesListeners = [];
+
+socket.on('records', records => {
+  console.log(records);
+  onUpdatesListeners.forEach(l => l(records));
+});
 
 export function fetchRecords() {
   return fetch('/api/record')
@@ -23,5 +29,6 @@ export function saveNewRecord(symbol) {
 }
 
 export function subscribeOnUpdates(callback) {
-
+  console.log('subbed');
+  onUpdatesListeners.push(callback);
 }
