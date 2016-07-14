@@ -60,8 +60,8 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve('build/client/index.html'));
 });
 
-server.listen(3000, () => {
-  console.log('server started. port: 3000');
+const server = app.listen(process.env.PORT || 3001, function() {
+  console.info('Listening on port:', this.address().port);
 });
 
 io.on('connection', function (socket) {
