@@ -4,7 +4,7 @@ import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 const timings = [
   'Pre-Market', 'Opening', '3 secs', '6 secs', '9 secs', '50 secs',
   '1 min', '1:10 min', '1:20 min', '4:50 mins', '5 mins', '5:10 mins',
-  'closing'
+  'Closing'
 ];
 
 const numberFormatter = (cell, row) => {

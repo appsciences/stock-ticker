@@ -1,10 +1,16 @@
 import React from 'react';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem, Glyphicon} from 'react-bootstrap';
 
 const RecordsMenu = ({ records, selected, onSelect }) => (
-  <DropdownButton title={selected.symbol}>
+  <DropdownButton title={selected.symbol || 'Select ticker'}>
     {
-      records.map(r => <MenuItem onSelect={() => onSelect(r)}>{r.symbol}</MenuItem>)
+      records.length ?
+          records.map(r =>
+              <MenuItem
+                  onSelect={() => onSelect(r)}>
+                {r.symbol}&nbsp;&nbsp;&nbsp;<Glyphicon glyph="minus-sign" />
+              </MenuItem>) :
+          <MenuItem> No tickers entered</MenuItem>
     }
   </DropdownButton>
 );
