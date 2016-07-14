@@ -23,7 +23,7 @@ const NewRecordControl = ({ onCreate }) => {
         <FormControl type="text" ref={n => input = n} />
         <InputGroup.Button>
           <Button onClick={clickHandler}>
-            Add
+            Add Ticker
           </Button>
         </InputGroup.Button>
       </InputGroup>
