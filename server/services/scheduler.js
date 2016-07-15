@@ -10,8 +10,14 @@ const timings = [
     name: 'pre-market',
     value: [
       '*/10 0-8,16-23 * * *', // every 0, 10, 20, 30, 40 and 50th min and 0-8,16-23 hours
-      '0,10,20 9 * * *'       // every 0, 10 and 20th minute past the 9th hour
+      '0,10 9 * * *'          // every 0, 10 and 20th minute past the 9th hour
     ]
+  },
+  {
+    id: 0,
+    name: 'pre-market',
+    value: ['20 9 * * *'],     // every 0, 10 and 20th minute past the 9th hour
+    after: () => storeCurrentAsFinal()
   },
   {
     id: 1,
@@ -39,22 +45,23 @@ const timings = [
 
 timings.forEach(timing => {
   timing.value.forEach(cron => schedule.scheduleJob(cron, () => {
-    if (timing.after) {
+    if (timing.after && Array.isArray(timing.after)) {
       timing.after.forEach(after => {
         setTimeout(() => executeUpdating(after.id), after.value);
       });
     }
 
-    executeUpdating(timing.id);
+    executeUpdating(timing.id)
+      .then(() => {
+        if (typeof timing.after === 'function') {
+          timing.after();
+        }
+      });
   }));
-});
-
-schedule.scheduleJob('0 0 * * *', () => {
-  storeCurrentAsFinal();
 });
 
 function executeUpdating(timingId) {
   console.log('Running job: timingId=', timingId);
-  updateRecords(timingId);
+  return updateRecords(timingId);
 }
 
