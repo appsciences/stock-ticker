@@ -8,18 +8,11 @@ import {
 } from 'react-bootstrap';
 
 
-const NewRecordControl = ({ value, onCreate }) => {
-  let input;
-
+const NoDays = ({ onChange }) => {
   return (
     <FormGroup>
       <InputGroup>
-        <FormControl type="text" value={value} />
-        <InputGroup.Button>
-          <Button onClick={clickHandler}>
-            Add Ticker
-          </Button>
-        </InputGroup.Button>
+        <FormControl type="text" onChange=={onChange} defualText="Enter no of days"/>
       </InputGroup>
     </FormGroup>
   );

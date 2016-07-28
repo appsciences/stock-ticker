@@ -16,7 +16,7 @@ const timings = [
   {
     id: 1,
     name: 'opening',
-    value: ['30 9 * * *'],    // at 09:30
+    value: ['32 10 * * *'],    // at 09:30
     after: [
       { id: 2, name: '3 secs', value: toMilliseconds(3) },
       { id: 3, name: '6 secs', value: toMilliseconds(6) },

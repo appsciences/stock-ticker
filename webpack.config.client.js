@@ -15,14 +15,15 @@ module.exports = {
       {
         test: /.js?$/,
         loader: 'babel-loader',
-        exclude: /node_modules/,
-        query: {
-          babelrc: false,
-          presets: ['es2015', 'stage-2', 'react']
-        }
+        exclude: /node_modules/
+
       },
       {
         test: /\.scss$/,
+        loaders: ['style', 'css', 'sass']
+      },
+      {
+        test: /\.css$/,
         loaders: ['style', 'css', 'sass']
       },
       {

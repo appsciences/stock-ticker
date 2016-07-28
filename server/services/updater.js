@@ -1,5 +1,6 @@
 import { getQuotes } from './yahoo.finance';
 import Record from '../models/record';
+require('log-timestamp');
 
 let listeners = [];
 
@@ -14,14 +15,26 @@ function emitUpdates() {
 export async function updateRecords(timingId) {
   const records = await Record.find().exec();
 
+
   if (!records.length) return;
 
   const symbols = records.map(r => r.symbol);
 
   try {
-    const quotes = await getQuotes(symbols);
+
+    console.time('yhoo-api');
+    const response = await getQuotes(symbols);
+
+    console.timeEnd('yhoo-api');
+
+    console.info('Received the following response');
+
+    console.dir(response);
+
+    const quotes = Array.isArray(response.query.results.quote) ? response.query.results.quote : [response.query.results.quote];
 
     const promises = quotes.map((quote, i) => {
+      console.log(`Update: quote timestamp: ${response.query.created}, symbol ${quote.symbol}, change ${quote.Change}`);
       return Record.update({ _id: records[i]._id }, {
         '$set': { [`numbers.day0.${timingId}`]: quote.Change }
       });
@@ -29,7 +42,7 @@ export async function updateRecords(timingId) {
 
     await Promise.all(promises);
     emitUpdates();
-    console.log('Successfully updated');
+    console.log(`Successfully updated ${timingId}`);
   } catch (e) {
     console.error(e.stack);
   }

@@ -1,10 +1,12 @@
 import React from 'react';
 
-import NumbersTable from '../components/NumbersTable';
-import NewRecordControl from '../components/NewRecordControl';
-import RecordsMenu from '../components/RecordsMenu';
+import {NumbersTable} from '../components/numbers-table';
 
-import { fetchRecords, saveNewRecord, subscribeOnUpdates } from '../actions';
+const Spinner = require('react-spinkit');
+
+import {Well, Alert} from 'react-bootstrap';
+import {displayIf, visibleIf} from '../components/show-if';
+
 
 class App extends React.Component {
   constructor(props) {
@@ -12,24 +14,49 @@ class App extends React.Component {
 
     this.state = {
       selectedRecord: {},
-      records: []
+      data: [],
+      noOfDays: 5
     };
 
     this.newRecordCreate = this.newRecordCreate.bind(this);
     this.selectRecord = this.selectRecord.bind(this);
+    this.addTicker = this.addTicker.bind(this);
+    this.componentDidMount = this.componentDidMount.bind(this);
   }
 
-  componentDidMount() {
-    const handler = records => {
-      this.setState({ records });
+  addTicker(event){
+    this.setState({tickers: [...this.state.tickers,event.target.value]})
+  }
 
-      if (records.length) {
-        this.selectRecord(records[0]);
-      }
-    };
-    
-    fetchRecords().then(handler);
-    subscribeOnUpdates(handler);
+  changeNoOfDays(val){ this.setState ({noofDays: val})}
+
+  componentDidMount() {
+
+    this.setState({loading:true});
+
+    const symbolsString = '"GOOG", "YHOO"';
+
+    const query = `select * from yahoo.finance.historicaldata where symbol = "YHOO" and startDate = "2016-07-21" and endDate = "2016-07-27"`;
+
+    var url = new URL('https://query.yahooapis.com/v1/public/yql');
+
+    url.searchParams.append('q', query);
+
+    url.searchParams.append('format', 'json');
+
+    url.searchParams.append('env', 'store://datatables.org/alltableswithkeys');
+
+    fetch(url)
+        .then(response => {
+
+          return response.json();
+
+        })
+        .then((data) => {
+          this.setState({data: data.query.results.quote, loading: false})
+        })
+        .catch(error => this.setState({error, loading:false}));
+
   }
 
   newRecordCreate(symbol) {
@@ -46,25 +73,14 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
-        <br />
-        <div className="col-md-2">
-          <RecordsMenu
-            selected={this.state.selectedRecord}
-            onSelect={this.selectRecord}
-            records={this.state.records}
-          />
-        </div>
-        <div className="col-md-3">
-          <NewRecordControl onCreate={this.newRecordCreate} />
-        </div>
-        <div>
-          {
-            this.state.selectedRecord.numbers &&
-            <NumbersTable record={this.state.selectedRecord} />
-          }
-        </div>
-      </div>
+        <Well>
+          <Spinner spinnerName='three-bounce' noFadeIn style={displayIf(this.state.loading)}/>
+          <Alert bsStyle="warning" style={visibleIf(this.state.error)}>
+            <strong>Error: </strong> {`Error message for support: ${this.state.error && this.state.error.message}`}
+          </Alert>
+
+          <NumbersTable data={this.state.data}/>
+</Well>
     )
   }
 }
