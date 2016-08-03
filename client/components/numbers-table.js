@@ -1,45 +1,66 @@
 import React from 'react';
+import _ from 'lodash';
+
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
-const numberFormatter = (cell, row) => {
+const numberFormatter = (cell) => {
     if (!cell) return '--';
     return cell > 0 ?
         <span style={{color: 'green'}}>+{cell}</span> :
         <span style={{color: 'red'}}>{cell}</span>;
 };
 
-const getTableData = ({data}) => {
+const getTableData = (data, days) => {
 
     var dayNo = 0;
-    const maxDays = 5;
 
+    let result = [];
 
-    return [data.reduce((prev, curr) => {
+    data.reduce((prev, curr) => {
 
-        if(dayNo === maxDays) {
+        let tickerEntry = Object.assign(prev, {symbol: curr.Symbol, ['day' + (dayNo+1)]:(parseFloat(curr.Close) - parseFloat(curr.Open)).toFixed(2)});
+
+        if(dayNo == days -1){
+            result = result.concat(tickerEntry);
             dayNo = 0;
-            result = result.concat(Object.assign({},prev));
+            tickerEntry = {};
+        }else{
+
+            dayNo = dayNo + 1;
         }
-        const result1 =
+        return tickerEntry;
 
-         Object.assign(prev, {symbol: curr.Symbol, ['day' + dayNo]:(parseFloat(curr.Close) - parseFloat(curr.Open)).toFixed(2)});
+    }, {});
 
-        dayNo = dayNo + 1;
-
-        return result1;
-    }, {})];
-
+    return result;
 };
 
-const NumbersTable = (data) => (
-    <BootstrapTable data={getTableData(data)} striped={true} hover={true}>
-      <TableHeaderColumn isKey={true} dataField="symbol" dataSort={true} dataFormat={numberFormatter}>Symbol</TableHeaderColumn>
-      <TableHeaderColumn dataField="day0" dataSort={true} dataFormat={numberFormatter}>-1 days</TableHeaderColumn>
-      <TableHeaderColumn dataField="day1" dataSort={true} dataFormat={numberFormatter}>-2 days</TableHeaderColumn>
-      <TableHeaderColumn dataField="day2" dataSort={true} dataFormat={numberFormatter}>-3 days</TableHeaderColumn>
-      <TableHeaderColumn dataField="day3" dataSort={true} dataFormat={numberFormatter}>-4 days</TableHeaderColumn>
-      <TableHeaderColumn dataField="day4" dataSort={true} dataFormat={numberFormatter}>-5 days</TableHeaderColumn>
-    </BootstrapTable>
-);
+const NumbersTable = ({data, onDeleteTicker, days}) => {
+
+    const tickerFormatter = (cell, row) =>
+        <div><Glyphicon glyph="align-left" onClick={(e) => onDelelteTicker(row)}/>&nbsp;cell</div>;
+
+
+    return (
+
+
+        <BootstrapTable
+            data={getTableData(data, days)}
+            striped={true}
+            hover={true}
+        >
+            <TableHeaderColumn isKey={true} dataField="symbol" dataSort={true}>Symbol</TableHeaderColumn>
+
+            {_.times(days, dayNo =>
+
+            <TableHeaderColumn
+                dataField={"day" + (dayNo + 1)}
+                dataSort={true}
+                dataFormat={numberFormatter}>
+                {"-" + (dayNo + 1)} days</TableHeaderColumn>
+            )}
+        </BootstrapTable>
+    );
+};
 
 export {NumbersTable, getTableData};

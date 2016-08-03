@@ -28,16 +28,6 @@ describe('numbers table', () => {
                 "Adj_Close": "38.849998"
             },
             {
-                "Symbol": "YHOO",
-                "Date": "2016-07-20",
-                "Open": "38.360001",
-                "High": "38.93",
-                "Low": "38.259998",
-                "Close": "38.900002",
-                "Volume": "8178000",
-                "Adj_Close": "38.900002"
-            },
-            {
                 "Symbol": "GOOG",
                 "Date": "2016-07-22",
                 "Open": "741.859985",
@@ -56,34 +46,19 @@ describe('numbers table', () => {
                 "Close": "738.630005",
                 "Volume": "969100",
                 "Adj_Close": "738.630005"
-            },
-            {
-                "Symbol": "GOOG",
-                "Date": "2016-07-20",
-                "Open": "737.330017",
-                "High": "742.130005",
-                "Low": "737.099976",
-                "Close": "741.190002",
-                "Volume": "1289700",
-                "Adj_Close": "741.190002"
             }
-        ])).toEqual([
+        ], 2)).toEqual([
+
             {
-                "Symbol": "GOOG",
-                "day1": "",
-                "day2": "",
-                "day3": "",
-                "day4": "",
-                "day5": ""
+                "Symbol": "YHOO",
+                "day1": '0.48',
+                "day2": '-0.16',
             },
             {
-                "Symbol": "Yahooo",
-                "day1": "",
-                "day2": "",
-                "day3": "",
-                "day4": "",
-                "day5": ""
-            }]);
+                "Symbol": "GOOG",
+                "day1": '0.88',
+                "day2": '-1.73'
+            },]);
 
     });
 });

@@ -1,88 +1,93 @@
 import React from 'react';
+import {getData} from '../actions/yahoo.finance';
 
 import {NumbersTable} from '../components/numbers-table';
 
 const Spinner = require('react-spinkit');
 
-import {Well, Alert} from 'react-bootstrap';
+import {Well, Alert,Form,FormControl,FormGroup,ControlLabel,Button} from 'react-bootstrap';
 import {displayIf, visibleIf} from '../components/show-if';
 
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
+const App = React.createClass({
+    getInitialState(){
+        return {
+            loading:false,
+            data:[],
+            tickers: [],
+            ticker:'',
+            error:null,
+            noOfDays: 5,
+            days: 5
+        };
 
-    this.state = {
-      selectedRecord: {},
-      data: [],
-      noOfDays: 5
-    };
+    },
 
-    this.newRecordCreate = this.newRecordCreate.bind(this);
-    this.selectRecord = this.selectRecord.bind(this);
-    this.addTicker = this.addTicker.bind(this);
-    this.componentDidMount = this.componentDidMount.bind(this);
-  }
+    addTicker(){
+        //set state is not immediate.
 
-  addTicker(event){
-    this.setState({tickers: [...this.state.tickers,event.target.value]})
-  }
+        const tickers = this.state.tickers.concat(this.state.ticker);
+        this.setState({tickers});
 
-  changeNoOfDays(val){ this.setState ({noofDays: val})}
+        this.refreshData(tickers, parseInt(this.state.noOfDays));
 
-  componentDidMount() {
+    },
 
-    this.setState({loading:true});
+    updateDays(){
+        this.setState({days:this.state.noOfDays});
 
-    const symbolsString = '"GOOG", "YHOO"';
+        this.refreshData(this.state.tickers, parseInt(this.state.noOfDays));
+    },
 
-    const query = `select * from yahoo.finance.historicaldata where symbol = "YHOO" and startDate = "2016-07-21" and endDate = "2016-07-27"`;
 
-    var url = new URL('https://query.yahooapis.com/v1/public/yql');
+    refreshData(tickers, days){
 
-    url.searchParams.append('q', query);
+        this.setState({loading: true});
 
-    url.searchParams.append('format', 'json');
+        getData(tickers, days)
+            .then(data => {
+                this.setState({
+                    data: data.query.results.quote,
+                    loading:false})
+            });
+        //.catch(error => this.setState({error, loading:false}));}
 
-    url.searchParams.append('env', 'store://datatables.org/alltableswithkeys');
+    },
 
-    fetch(url)
-        .then(response => {
+    render() {
+        return (
+            <Well>
+                <Spinner spinnerName='three-bounce' noFadeIn style={displayIf(this.state.loading)}/>
+                <Alert bsStyle="warning" style={visibleIf(this.state.error)}>
+                    <strong>Error: </strong> {`Error message for support: ${this.state.error && this.state.error.message}`}
+                </Alert>
+                <Form inline>
+                    <FormGroup controlId="noOfDays">
+                        <ControlLabel>Add Ticker</ControlLabel>
+                        {' '}
+                        <FormControl
+                            type="text"
+                            value={this.state.ticker}
+                            onChange={e => this.setState({ticker: e.target.value})}/>
+                        <Button
+                            onClick={this.addTicker}>Add</Button>&nbsp;
+                        <ControlLabel>No of Days</ControlLabel>
+                        {' '}
+                        <FormControl
+                            type="text"
+                            value={this.state.noOfDays}
+                            onChange={e => this.setState({noOfDays:e.target.value})}/>
+                        <Button
+                            onClick={this.updateDays}
 
-          return response.json();
-
-        })
-        .then((data) => {
-          this.setState({data: data.query.results.quote, loading: false})
-        })
-        .catch(error => this.setState({error, loading:false}));
-
-  }
-
-  newRecordCreate(symbol) {
-    saveNewRecord(symbol).then(record => {
-      this.setState({
-        records: [...this.state.records, record]
-      });
-    });
-  }
-
-  selectRecord(selectedRecord) {
-    this.setState({ selectedRecord });
-  }
-
-  render() {
-    return (
-        <Well>
-          <Spinner spinnerName='three-bounce' noFadeIn style={displayIf(this.state.loading)}/>
-          <Alert bsStyle="warning" style={visibleIf(this.state.error)}>
-            <strong>Error: </strong> {`Error message for support: ${this.state.error && this.state.error.message}`}
-          </Alert>
-
-          <NumbersTable data={this.state.data}/>
-</Well>
-    )
-  }
-}
+                            >Save</Button>
+                    </FormGroup>
+                </Form>
+                <br/>
+                <NumbersTable data={this.state.data} days={this.state.days}/>
+            </Well>
+        )
+    }
+});
 
 export default App;

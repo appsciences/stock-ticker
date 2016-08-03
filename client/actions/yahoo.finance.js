@@ -1,24 +1,30 @@
-import request from 'request-promise';
+/**
+ *
+ * @param tickers -- Array of ticker strings
+ * @param days -- No of days
+ * @returns {Promise|*|Promise.<TResult>}
+ */
 
-export function getQuotes(symbols) {
-  const symbolsString = symbols.map(s => `"${s}"`).join(',');
+export function getQuery(tickers, days){
 
-  const query = `select * from yahoo.finance.historicaldata where ` +
-      `symbol in (${symbolsString}) ` +
-      `and startDate = 2016-06-20 `
-      `and endDate = 2016-06-25 `;
+    const tickersString = tickers.map(s => `"${s}"`).join(',');
 
-  const uri = 'https://query.yahooapis.com/v1/public/yql';
+    return `select * from yahoo.finance.historicaldata where symbol in (${tickersString}) and startDate = "2016-07-21" and endDate = "2016-07-27"`;
 
-  const options = {
-    uri,
-    json: true,
-    qs: {
-      q: query,
-      format: 'json',
-      env: 'store://datatables.org/alltableswithkeys'
-    }
-  };
 
-  return request(options);
+}
+
+export function getData(tickers, days) {
+
+  var url = new URL('https://query.yahooapis.com/v1/public/yql');
+
+  url.searchParams.append('q', getQuery(tickers,days));
+
+  url.searchParams.append('format', 'json');
+
+  url.searchParams.append('env', 'store://datatables.org/alltableswithkeys');
+
+  return fetch(url)
+      .then(response => response.json());
+
 }
