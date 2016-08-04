@@ -1,7 +1,7 @@
 import React from 'react';
 import {getData} from '../actions/yahoo.finance';
 
-import {NumbersTable} from '../components/numbers-table';
+import {NumbersTable} from '../components/quotes-table';
 
 const Spinner = require('react-spinkit');
 
@@ -26,10 +26,12 @@ const App = React.createClass({
     addTicker(){
         //set state is not immediate.
 
+        if(this.state.tickers.indexOf(this.state.ticker) > -1) return;
+
         const tickers = this.state.tickers.concat(this.state.ticker);
         this.setState({tickers});
 
-        this.refreshData(tickers, parseInt(this.state.noOfDays));
+        this.refreshData(tickers, parseInt(this.state.days));
 
     },
 

@@ -1,6 +1,6 @@
 jest.disableAutomock();
 
-import { getTableData } from '../client/components/numbers-table';
+import { getTableData } from '../client/components/quotes-table';
 
 describe('numbers table', () => {
 

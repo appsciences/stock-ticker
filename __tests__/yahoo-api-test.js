@@ -2,7 +2,7 @@ jest.disableAutomock();
 
 var urlShim = require('urlutils');
 
-import { getData, getQuery } from '../client/actions/yahoo.finance';
+import { getData, getQuery, startDate, endDate } from '../client/actions/yahoo.finance';
 
 xdescribe('Yahoo API Test', () => {
 
@@ -52,3 +52,32 @@ describe('Query test', () => {
 
 
 
+xdescribe('Date formatting', () => {
+
+    it('formats date', () => {
+
+
+            expect(startDate(5)).toBe('2016-07-29');
+            expect(endDate()).toBe('2016-08-03');
+        }
+    );
+
+    it('formats proper query with two tickers', () => {
+
+
+            expect(getQuery(['GOOG','YHOO'],5)).toBe(
+                'select * from yahoo.finance.historicaldata where symbol in ("GOOG","YHOO") and startDate = "2016-07-21" and endDate = "2016-07-27"'
+            );
+        }
+    );
+
+
+    it('formats proper query with three tickers', () => {
+
+
+            expect(getQuery(['GOOG','YHOO','MSFT'],5)).toBe(
+                'select * from yahoo.finance.historicaldata where symbol in ("GOOG","YHOO","MSFT") and startDate = "2016-07-21" and endDate = "2016-07-27"'
+            );
+        }
+    );
+})
